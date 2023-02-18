@@ -5,6 +5,15 @@ Personal project for creating one-page sites (articles) and searching for them.
 
 This is a site that allows you to search for blogs by authorship or title (for an accurate search, you can search by ID). You can also view these blogs, edit if you forget the password and create new ones.
 
+The launch is made after the download and unpacking the zip archive.
+Navigate cmd to the directory of the downloaded folder.
+
+```html
+npm install express
+node app.js
+http://localhost:5500/search
+```
+
 Below are screenshots showing the functionality.
 
 <p align="center">
