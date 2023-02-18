@@ -34,3 +34,6 @@ Below are screenshots showing the functionality.
 <p align="center">
   <img src="https://github.com/Mika-dot/Telegrapher/blob/main/Media/search.PNG?raw=true" alt="ConsoleWriteImage"/>
 </p>
+---
+
+Для оценщиков selectel это личный проект, есть интеграция с OpenJSCAD так что можносоздовать 3d модели кодам и прикреплять к страницам, но они недавно перешли на другое api так что времено вырезал.
