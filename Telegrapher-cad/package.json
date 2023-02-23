@@ -1,0 +1,19 @@
+{
+  "name": "Telegraf",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@admin-interface/core": "^0.1.30",
+    "@admin-interface/express": "^0.1.32",
+    "@supabase/supabase-js": "^2.1.1",
+    "express": "^4.18.2",
+    "firebase": "^9.17.1",
+    "md5": "^2.3.0"
+  }
+}
