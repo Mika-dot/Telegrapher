@@ -40,6 +40,12 @@ Added openjscad at the end of articles.
 <p align="center">
   <img src="https://github.com/Mika-dot/Telegrapher/blob/main/Media/jscad.PNG?raw=true" alt="ConsoleWriteImage"/>
 </p>
+
+Search on the site can be carried out in the form of a visual presentation of pages dependencies
+
+<p align="center">
+  <img src="https://github.com/Mika-dot/Telegrapher/blob/main/Media/graf.PNG?raw=true" alt="ConsoleWriteImage"/>
+</p>
 ---
 
 Для оценщиков selectel это личный проект, есть интеграция с OpenJSCAD так что можносоздовать 3d модели кодам и прикреплять к страницам, но они недавно перешли на другое api так что времено вырезал.
