@@ -22,9 +22,9 @@ const supabase = supb.createClient(supabaseUrl, supabaseKey)
 
 // Обращение к картам
 //↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
-AddCard = async function (author, name, body, pass, geometry) {
+AddCard = async function (author, name, body, pass, geometry, teg) {
     console.log('\x1b[33m%s\x1b[0m', 'Вошел в функцию AddCard ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓');
-    console.log(author, name, body, pass, geometry);
+    console.log(author, name, body, pass, geometry, teg);
     const { data, error } = await supabase
         .from('articles')
         .insert([{
@@ -33,7 +33,8 @@ AddCard = async function (author, name, body, pass, geometry) {
             name: name,
             md5: md5(author + name + body),
             password: pass,
-            geometry: geometry
+            geometry: geometry,
+            teg: teg
         }])
     console.log('Ошибка - ', data, error);
     console.log('\x1b[33m%s\x1b[0m', 'Вышел из функции AddCard ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑');
@@ -43,7 +44,17 @@ GetCards = async function () {
     console.log('\x1b[33m%s\x1b[0m', 'Вошел в функцию GetCards ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓');
     let { data: Card, error } = await supabase
         .from('articles')
-        .select('*');
+        .select('id, author, name');
+    console.log(`Ответ от БД: ${JSON.stringify(Card)}`);
+    console.log('\x1b[33m%s\x1b[0m', 'Вышел из функции GetCards ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑');
+    return Card;
+}
+
+GetCardsGet = async function () {
+    console.log('\x1b[33m%s\x1b[0m', 'Вошел в функцию GetCards ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓');
+    let { data: Card, error } = await supabase
+        .from('articles')
+        .select('id, teg');
     console.log(`Ответ от БД: ${JSON.stringify(Card)}`);
     console.log('\x1b[33m%s\x1b[0m', 'Вышел из функции GetCards ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑');
     return Card;
@@ -74,6 +85,7 @@ UpdateCard = async function (id, author, name, body, geometry) {
         })
         .eq('id', id);
 }
+
 //↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑
 
 
@@ -84,7 +96,10 @@ app.post("/api/Article", jsonParser, function (req, res) { // Запись в б
 
     if (!req.body) return res.sendStatus(400);
 
-    AddCard(req.body.author, req.body.name, req.body.body, req.body.pass, req.body.geometry);
+    console.log(req.body);
+
+    AddCard(req.body.author, req.body.name, req.body.body, req.body.pass, req.body.geometry, req.body.teg);
+
 
 });
 
@@ -103,7 +118,7 @@ app.post("/zero/api/ArticleUpdate", jsonParser, function (req, res) { // Зап�
         console.log('\x1b[33m%s\x1b[0m', "Сравнение: " + resss[0].password + " и " + req.body.pass)
         if (resss[0].password == req.body.pass) {
             //id, author, name, body
-            UpdateCard(req.body.id, req.body.author, req.body.name, req.body.body, req.body.geometry);
+            UpdateCard(req.body.id, req.body.author, req.body.name, req.body.body, req.body.geometry, req.body.get);
         }
     }
 
@@ -113,6 +128,14 @@ app.get("/api/Requests", function (req, res) {  // запрос всей баз�
 
     console.log('\x1b[33m%s\x1b[0m', 'Все записи');
     let r = GetCards();
+    r.then(resss => res.send(`{"data":` + JSON.stringify(resss) + "}")); // отправка данных
+
+});
+
+app.get("/api/RequestsGet", function (req, res) {  // запрос всей базы
+
+    console.log('\x1b[33m%s\x1b[0m', 'Все записи');
+    let r = GetCardsGet();
     r.then(resss => res.send(`{"data":` + JSON.stringify(resss) + "}")); // отправка данных
 
 });
