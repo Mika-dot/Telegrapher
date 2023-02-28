@@ -27,7 +27,7 @@ Below are screenshots showing the functionality.
 
 
 <p align="center">
-  <img src="https://github.com/Mika-dot/Telegrapher/blob/main/Media/graf.JPG?raw=true" alt="ConsoleWriteImage"/>
+  <img src="https://github.com/Mika-dot/Telegrapher/blob/main/Media/pages.PNG?raw=true" alt="ConsoleWriteImage"/>
 </p>
 
 
@@ -44,7 +44,7 @@ Added openjscad at the end of articles.
 Search on the site can be carried out in the form of a visual presentation of pages dependencies
 
 <p align="center">
-  <img src="https://github.com/Mika-dot/Telegrapher/blob/main/Media/graf.PNG?raw=true" alt="ConsoleWriteImage"/>
+  <img src="https://github.com/Mika-dot/Telegrapher/blob/main/Media/graf.JPG?raw=true" alt="ConsoleWriteImage"/>
 </p>
 ---
 
