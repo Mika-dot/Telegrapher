@@ -95,17 +95,27 @@
             <input class="p-2" name="author" placeholder="Автор" />
         </div>
 
+
     </form>
 
-        <div class="m-auto" style="max-width: 700px;">
-            <textarea name="content" class="editor"></textarea>
+    <div class="m-auto" style="max-width: 700px;">
+        <textarea name="content" class="editor"></textarea>
+    </div>
+
+    <div class="m-auto" style="max-width: 700px;">
+        <button onclick="AddTag();" id="tag" style="margin: 5% 0 5% 0;" type="button" class="btn btn-light">Добавить
+            тэг</button>
+        <input class="p-2" id="tagsadding" name="tagsadding" placeholder="Тэг" />
+        <div class="m-auto, article" style="max-width: 700px;">
+
         </div>
+    </div>
 
-        <div class="b-example-divider"></div>
+    <div class="b-example-divider"></div>
 
-        <div id="viewer"></div>
+    <div id="viewer"></div>
 
-        <textarea style="
+    <textarea style="
         display: block;
         margin: 0px auto;
         resize: both;
@@ -119,17 +129,35 @@
         }
         </textarea>
 
-        <input style="
+    <input style="
         display: block;
         margin: 5% auto;
-        max-width: 700px; " class="p-2" type="submit" value="Update"
-            onclick="updateSolid(); return false;">
+        max-width: 700px; " class="p-2" type="submit" value="Update" onclick="updateSolid(); return false;">
 
-        <!-- style="display: none;" -->
+    <!-- style="display: none;" -->
 
 </body>
 
 <script src='https://dl.dropboxusercontent.com/s/hb9vf8r4vz7imyy/ckeditor.js'></script>
+<script>
+    let teg = [];
+    function AddTag() {
+        console.log(document.getElementById("tagsadding").value);
+
+        teg[teg.length] = document.getElementById("tagsadding").value;
+
+        var articleDiv = document.querySelector("div.article");
+        // создаем элемент
+        var elem = document.createElement("p");
+        // создаем для него текст
+        var elemText = document.createTextNode(document.getElementById("tagsadding").value);
+        // добавляем текст в элемент в качестве дочернего элемента
+        elem.appendChild(elemText);
+        // добавляем элемент в блок div
+        articleDiv.appendChild(elem);
+
+    }
+</script>
 <script>
     var myEditor;
     ClassicEditor.create(document.querySelector(".editor"), {
@@ -192,8 +220,9 @@
                     name: document.forms["userForm"].elements["name"].value,
                     body: temp,
                     pass: document.forms["userForm"].elements["password"].value,
-                    geometry: document.getElementById('code').value
-                })
+                    geometry: document.getElementById('code').value,
+                    teg: teg
+                })   
             });
 
         document.cookie = "Card=" + CryptoJS.MD5(

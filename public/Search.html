@@ -11,6 +11,15 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/core.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/md5.js"></script>
 
+    <script src="//unpkg.com/three"></script>
+    <script src="//unpkg.com/three-spritetext"></script>
+    <script src="//unpkg.com/3d-force-graph"></script>
+    <style>
+        span {
+            color: black;
+        }
+    </style>
+
 <body>
 
     <form name="userForm" class="card p-2" style="margin: 10% 10%;">
@@ -21,9 +30,12 @@
                 <option>Name</option>
                 <option>ID</option>
             </select>
-            <input onchange="Read()" type="text" class="form-control" name="Search" placeholder="Искомое значение">
+            <input style="display: none;" id="searchEngine" onchange="Read()" type="text" class="form-control"
+                name="Search" placeholder="Искомое значение">
         </div>
     </form>
+
+    <div id="force-directed-graph"></div>
 
     <div id="cardsList">
 
@@ -33,24 +45,39 @@
 <script src='https://dl.dropboxusercontent.com/s/hb9vf8r4vz7imyy/ckeditor.js'></script>
 <script>
 
-    // myEditor.setData(text); // ввод текста в content
-    // myEditor.getData(); // вывод значений
+    var nodes3d = [];
+    var edges3d = [];
+
+    var elem;
+
+    var positiveColor = '#265500',
+        negativeColor = '#b7241b',
+        positiveColorHover = '#96d800',
+        negativeColorHover = '#f58f92',
+        textColor = '#213036',
+        graphBGcolor = '#ffffff';
+    var nodeRelSize = 15;
+
+    var gdata;
+
+
+    var myGraph;
+
+    let highlightNodes = [];
+    let highlightLinks = [];
+
 
     function Read() {
-
-        console.log("+");
 
         document.getElementById('cardsList').innerHTML = '';
 
         if (document.forms["userForm"].elements["Reque"].value == "Everybody") {
+            document.getElementById("searchEngine").style.display = "none";
             GetUsers();
         } else {
+            document.getElementById("searchEngine").style.display = "inline";
             SearchValues();
         }
-
-        //GetUsers();
-        //     console.log("/api/Requests/Request=" + Request + "&Search=" + document.forms["userForm"].elements["Search"].value);
-
 
     }
 
@@ -80,12 +107,38 @@
             method: "GET",
             headers: { "Accept": "application/json" }
         });
+
+        const responseget = await fetch("/api/RequestsGet", {
+            method: "GET",
+            headers: { "Accept": "application/json" }
+        });
+
         // если запрос прошел нормально
         if (response.ok === true) {
             // получаем данные
             const data = await response.json();
-            //console.log(data.data);
-            console.log(data.data[0].id); // робит
+            const dataget = await responseget.json();
+
+            nodes3d = data.data;
+            edges = dataget.data;
+
+
+
+            edges3d = [];
+            edges.forEach(obj => {
+                JSON.parse(obj.teg).forEach(i => {
+                    edges3d.push({ source: obj.id, target: Number(i) });
+                });
+            });
+
+            elem = document.getElementById('force-directed-graph');
+            myGraph = ForceGraph3D();
+
+            gdata = {
+                nodes: nodes3d,
+                links: edges3d
+            };
+            init();
 
             document.getElementById('cardsList').innerHTML = '';
 
@@ -126,6 +179,142 @@
         window.location.href = '/pages/' + id;
     }
 
+    function init() {
+        console.log("nodes3d");
+        console.log(nodes3d);
+        console.log("edges");
+        console.log(edges);
+        var mostLinkedNode = getMostLinkedNode()[0].key;
+        buildGraph();
+        setTimeout(function () {
+            myGraph.d3Force('charge').strength(-150);
+            focusOnMostLinkedNode(mostLinkedNode, gdata.nodes);
+        }, 1000);
+
+    }
+
+    function buildGraph() {
+        myGraph(elem)
+            .graphData(gdata)
+            .backgroundColor(graphBGcolor)
+            //NODE INFO
+            .nodeThreeObject(node => {
+                const sprite = new SpriteText(node.id);
+                sprite.color = textColor;
+                sprite.textHeight = 8;
+                return sprite;
+            })
+            .nodeColor(function (d) {
+                if (highlightNodes.indexOf(d) === -1) {
+                    return d.val < 0 ? negativeColor : positiveColor;
+                }
+                return d.val < 0 ? negativeColorHover : positiveColorHover;
+
+            })
+            .nodeVal(function (d) {
+                return Math.abs(d.val);
+            })
+            .nodeRelSize(nodeRelSize)
+            .nodeLabel(function (d) {
+                return "<div><span class='label'>Статья: " + d.author + "<br />Имя: " + d.name + "</span></div>";
+            })
+            .nodeOpacity(1)
+            .onNodeHover(node => {
+                elem.style.cursor = node ? 'pointer' : null;
+
+                // no state change
+                if ((!node && !highlightNodes.length) || (highlightNodes.length === 1 && highlightNodes[0] === node)) return;
+                highlightNodes = node ? [node] : [];
+                updateGeometries();
+            })
+            .onNodeClick(node => {
+                updateCamera(node);
+            })
+            .linkColor(function (d) {
+                if (highlightLinks.indexOf(d) === -1) {
+                    return d.weight < 0 ? negativeColor : positiveColor;
+                }
+                return d.weight < 0 ? negativeColorHover : positiveColorHover;
+
+            })
+            .linkCurvature(0.2)
+            .linkDirectionalArrowLength(9)
+            .linkDirectionalArrowRelPos(1)
+            .linkDirectionalParticles(function (d) {
+                return highlightLinks.indexOf(d) === -1 ? 0 : 5
+            })
+            .linkDirectionalParticleWidth(5)
+            .linkDirectionalParticleColor(function (d) {
+                return d.weight < 0 ? negativeColorHover : positiveColorHover
+            })
+            .linkHoverPrecision(10)
+            .onLinkHover(link => {
+                // no state change
+                if ((!link && !highlightLinks.length) || (highlightLinks.length === 1 && highlightLinks[0] === link)) return;
+                highlightLinks = link ? [link] : [];
+                highlightNodes = link ? [link.id, link.target] : [];
+                updateGeometries();
+            });
+    }
+
+    function updateGeometries() {
+        myGraph.nodeRelSize(nodeRelSize); // trigger update of 3d objects in scene
+    }
+
+    function updateCamera(node) {
+        // Aim at node from outside it
+        const distance = 150;
+        const distRatio = 1 + distance / Math.hypot(node.x, node.y, node.z);
+        myGraph.cameraPosition({
+            x: node.x * distRatio,
+            y: node.y * distRatio,
+            z: node.z * distRatio
+        }, // new position
+            node, // lookAt ({ x, y, z })
+            2000 // ms transition duration
+        );
+    }
+
+    function focusOnMostLinkedNode(mostLinkedNode, nodes) {
+        var nodeToFocusOn = nodes.filter(function (node) {
+            return node.id === mostLinkedNode;
+        });
+        updateCamera(nodeToFocusOn[0]);
+    }
+
+    function getMostLinkedNode() {
+        var nodeLinkCount = getNumberOfTimesEachNodeIsLinked();
+        var mostLinkedNodeVal = sortObject(nodeLinkCount);
+        return mostLinkedNodeVal;
+    }
+
+    function getNumberOfTimesEachNodeIsLinked() {
+        return edges3d.reduce(function (pre, curr) {
+            if (pre[curr.target]) {
+                pre[curr.target]++;
+            } else {
+                pre[curr.target] = 1;
+            }
+            return pre;
+        }, {});
+    }
+
+    function sortObject(obj) {
+        var arr = [];
+        var prop;
+        for (prop in obj) {
+            if (obj.hasOwnProperty(prop)) {
+                arr.push({
+                    'key': prop,
+                    'value': obj[prop]
+                });
+            }
+        }
+        arr.sort(function (a, b) {
+            return a.value - b.value;
+        });
+        return arr.reverse(); // returns array
+    }
 
 </script>
 
