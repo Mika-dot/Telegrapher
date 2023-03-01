@@ -18,6 +18,7 @@
         span {
             color: black;
         }
+        html { overflow-x:  hidden; }
     </style>
 
 <body>
@@ -35,10 +36,10 @@
         </div>
     </form>
 
-    <div id="force-directed-graph"></div>
-
     <div id="cardsList">
-
+        <div class="m-auto" style="max-width: 700px;">
+            <label >Тут ничего нету, ведите запрос</label>
+        </div>
     </div>
 </body>
 
@@ -52,7 +53,7 @@
     let highlightNodes = [];
     let highlightLinks = [];
 
-    var elem = document.getElementById('force-directed-graph');
+    var elem = document.getElementById('cardsList');
     var myGraph = ForceGraph3D();
 
     var positiveColor = '#265500',
@@ -128,13 +129,14 @@
                 links: edges3d
             };
 
-            init();
-
             document.getElementById('cardsList').innerHTML = '';
+
+            init();
 
             for (let i = 0; i < data.data.length; i++) {
                 row(data.data[i]);
             }
+
         }
     }
 
@@ -188,6 +190,7 @@
                 const sprite = new SpriteText(node.id);
                 sprite.color = textColor;
                 sprite.textHeight = 8;
+                console.log(sprite);
                 return sprite;
             })
             .nodeColor(function (d) {
@@ -202,7 +205,7 @@
             })
             .nodeRelSize(nodeRelSize)
             .nodeLabel(function (d) {
-                return "<div><span class='label'>Статья: " + d.author + "<br />Имя: " + d.name + "</span></div>";
+                return "<div><span class='label'>Статья: " + d.author + "<br />Имя: " + d.name + "</span> </div>";
             })
             .nodeOpacity(1)
             .onNodeHover(node => {
