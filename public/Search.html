@@ -19,11 +19,14 @@
             color: black;
         }
         html { overflow-x:  hidden; }
+        .scene-nav-info {
+            display: none;
+        }
     </style>
 
 <body>
 
-    <form name="userForm" class="card p-2" style="margin: 10% 10%;">
+    <form name="userForm" class="card p-2" style="margin: 10% 10% 0 10%;">
         <div class="input-group">
             <select onchange="Read()" class="form-select" name="Reque" required="">
                 <option>Everybody</option>
@@ -37,9 +40,7 @@
     </form>
 
     <div id="cardsList">
-        <div class="m-auto" style="max-width: 700px;">
-            <label >Тут ничего нету, ведите запрос</label>
-        </div>
+            <label style="max-width: 700px; margin: 10% 10%;">Тут ничего нету, ведите запрос</label>
     </div>
 </body>
 
